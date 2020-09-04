@@ -2,17 +2,25 @@
 exports.main = async (event, context) => {
   //event为客户端上传的参数
   console.log('event : ' + event);
+	const {keyword} = event
   
-  if(!event.keyword)return "parameter keyword missed";
+  if(!keyword)return "parameter keyword missed";
+	
+	const db = uniCloud.database()
+	db.collection('garbage-classification').add({
+		data: {
+			keyword
+		}
+	})
   
-  const classify_res=await uniCloud.httpclient.request("https://sffc.sh-service.com/wx_miniprogram/sites/feiguan/trashTypes_2/Handler/Handler.ashx?a=EXC_QUERY&kw="+event.keyword,{
+  const classify_res=await uniCloud.httpclient.request("https://sffc.sh-service.com/wx_miniprogram/sites/feiguan/trashTypes_2/Handler/Handler.ashx?a=EXC_QUERY&kw="+keyword,{
 	  dataType:"json"
   });
   
   if(classify_res.status!=200)return classify_res;
   
-  let finalData={
-	  keyword:event.keyword,
+  const finalData={
+	  keyword,
 	  matched:null,
 	  similars:[]
   };
